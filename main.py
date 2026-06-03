@@ -16,6 +16,22 @@ def generate_hand():
         suit_or_offsuit = random.choice(["s", "o"])
         return hand + suit_or_offsuit
     
+def get_number_of_questions():
+    while True:
+        answer = input("How many questions would you like me to ask? ")
+
+        try:
+            number = int(answer)
+        except ValueError:
+            print("Please enter a whole number.")
+            continue
+
+        if number <= 0 :
+            print("Please enter a number greater than 0.")
+            continue
+
+        return number
+
 def get_correct_action(hand):
     return "raise" if hand in raise_range else "fold"
 
@@ -30,7 +46,7 @@ def normalize_answer(answer):
         return answer
 
 score = 0
-number_of_questions = int(input("How many questions would you like me to ask? "))
+number_of_questions = get_number_of_questions()
 
 for question_number in range(number_of_questions):
     hand = generate_hand()
@@ -40,12 +56,15 @@ for question_number in range(number_of_questions):
         print("That doesn't look to be a correct input... Please enter raise or fold.")
         user_answer = normalize_answer(input(f"{hand}. Raise or fold? "))
 
-    if user_answer == get_correct_action(hand):
+    correct_action = get_correct_action(hand)
+
+    if user_answer == correct_action:
         score += 1
-        print(f"Correct! Your score is now {score}")
+        print(f"Correct! Your score is now {score}.")
     else:
-        print(f"Incorrect! Your score is {score}")
+        print(f"Incorrect! According to your ranges, you should {correct_action} {hand}. Your score is {score}.")
             
+print(f"Your final score is {score}/{number_of_questions} or {round(score / number_of_questions * 100)}%.")
 
         
         
