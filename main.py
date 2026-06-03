@@ -18,10 +18,24 @@ def generate_hand():
 def get_correct_action(hand):
     return "raise" if hand in raise_range else "fold"
 
+def normalize_answer(answer):
+    answer = answer.lower().strip()
+
+    if answer == "r":
+        return "raise"
+    elif answer == "f":
+        return "fold"
+    else:
+        return answer
+
 hand = generate_hand()
 
-user_answer = input(f"{hand}. Raise or fold? ")
-print(repr(user_answer))
+user_answer = normalize_answer(input(f"{hand}. Raise or fold? "))
+options = ["raise", "fold"]
+
+while user_answer not in options:
+    print("That doesn't look to be a correct input... Please enter raise or fold.")
+    user_answer = normalize_answer(input(f"{hand}. Raise or fold? "))
 
 if user_answer == get_correct_action(hand):
     print("Correct!")
