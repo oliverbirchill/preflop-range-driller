@@ -3,6 +3,7 @@ import random
 ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 suits = ["♤", "♡", "♢", "♧"]
 raise_range = {"AA", "QQ", "AKs", "AQs", "AKo"}
+options = {"raise", "fold"}
 
 def generate_hand():
     rank_1 = random.choice(ranks)
@@ -28,19 +29,23 @@ def normalize_answer(answer):
     else:
         return answer
 
-hand = generate_hand()
+score = 0
+number_of_questions = int(input("How many questions would you like me to ask? "))
 
-user_answer = normalize_answer(input(f"{hand}. Raise or fold? "))
-options = ["raise", "fold"]
-
-while user_answer not in options:
-    print("That doesn't look to be a correct input... Please enter raise or fold.")
+for question_number in range(number_of_questions):
+    hand = generate_hand()
     user_answer = normalize_answer(input(f"{hand}. Raise or fold? "))
 
-if user_answer == get_correct_action(hand):
-    print("Correct!")
-else:
-    print("Incorrect!")
+    while user_answer not in options:
+        print("That doesn't look to be a correct input... Please enter raise or fold.")
+        user_answer = normalize_answer(input(f"{hand}. Raise or fold? "))
+
+    if user_answer == get_correct_action(hand):
+        score += 1
+        print(f"Correct! Your score is now {score}")
+    else:
+        print(f"Incorrect! Your score is {score}")
+            
 
         
         
