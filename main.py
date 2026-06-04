@@ -1,46 +1,33 @@
 import random
+import csv
 
 ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 suits = ["♤", "♡", "♢", "♧"]
-raise_range = {
-    "UTG": {    "AA", "KK", "QQ", "JJ", "TT", "99", "88", "77", "66", "55", "44", "33", "22",
-    "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s",
-    "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s",
-    "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "Q2s",
-    "JTs", "J9s", "J8s", "J7s", "J6s", "J5s", "J4s", "J3s", "J2s",
-    "T9s", "T8s", "T7s", "T6s", "T5s", "T4s", "T3s", "T2s",
-    "98s", "97s", "96s", "95s", "94s", "93s", "92s",
-    "87s", "86s", "85s", "84s", "83s", "82s",
-    "76s", "75s", "74s", "73s", "72s",
-    "65s", "64s", "63s", "62s",
-    "54s", "53s", "52s",
-    "43s", "42s",
-    "32s",
-
-    "AKo", "AQo", "AJo", "ATo", "A9o", "A8o", "A7o", "A6o", "A5o", "A4o", "A3o", "A2o",
-    "KQo", "KJo", "KTo", "K9o", "K8o", "K7o", "K6o", "K5o", "K4o", "K3o", "K2o",
-    "QJo", "QTo", "Q9o", "Q8o", "Q7o", "Q6o", "Q5o", "Q4o", "Q3o", "Q2o",
-    "JTo", "J9o", "J8o", "J7o", "J6o", "J5o", "J4o", "J3o", "J2o",
-    "T9o", "T8o", "T7o", "T6o", "T5o", "T4o", "T3o", "T2o",
-    "98o", "97o", "96o", "95o", "94o", "93o", "92o",
-    "87o", "86o", "85o", "84o", "83o", "82o",
-    "76o", "75o", "74o", "73o", "72o",
-    "65o", "64o", "63o", "62o",
-    "54o", "53o", "52o",
-    "43o", "42o",
-    "32o"},
-    "HJ": {"AA", "QQ", "AKs", "AQs", "AKo"},
-    "CO": {"AA", "QQ", "AKs", "AQs", "AKo"},
-    "BTN": {"AA", "QQ", "AKs", "AQs", "AKo"},
-    "SB": {"AA", "QQ", "AKs", "AQs", "AKo"},
-}
 options = {"raise", "fold"}
+
+def get_ranges():
+    ranges = {}
+
+    with open("ranges.csv", mode="r") as file:
+        csv_reader = csv.reader(file)
+        next(csv_reader)
+        
+        for row in csv_reader:
+            position = row[0]
+            hand = row[1]
+
+            if position not in ranges:
+                ranges[position] = {hand}
+            else:
+                ranges[position].add(hand)
+
+    return ranges
 
 def get_position():
     while True:
         position = input("Which position do you want to practise? UTG/HJ/CO/BTN/SB: ").upper().strip()
 
-        if position in raise_range:
+        if position in raise_ranges:
             return position
 
         print("Please enter a valid position: UTG/HJ/CO/BTN/SB.")
@@ -102,7 +89,7 @@ def get_number_of_questions():
         return number
 
 def get_correct_action(position, hand_notation):
-    return "raise" if hand_notation in raise_range[position] else "fold"
+    return "raise" if hand_notation in raise_ranges[position] else "fold"
 
 def normalize_answer(answer):
     answer = answer.lower().strip()
@@ -138,6 +125,7 @@ def display_ascii_hand(hand):
     return "\n".join(combined_lines)
  
 score = 0
+raise_ranges = get_ranges()
 missed_hands = []
 
 position = get_position()
@@ -147,15 +135,15 @@ for question_number in range(number_of_questions):
     hand, hand_notation = generate_hand()
     ascii_hand_display = display_ascii_hand(hand)
 
-    print(f"\nQuestion {question_number + 1}/{number_of_questions}")
+    print(f"\nQuestion {question_number + 1}/{number_of_questions} - {position}")
     print(ascii_hand_display)
-    user_answer = normalize_answer(input("Raise or fold? "))
+    user_answer = normalize_answer(input(f"{position}: raise or fold? "))
 
     while user_answer not in options:
         print("\nPlease enter raise/r or fold/f.")
-        print(f"Question {question_number + 1}/{number_of_questions}")
+        print(f"Question {question_number + 1}/{number_of_questions} - {position}")
         print(ascii_hand_display)
-        user_answer = normalize_answer(input("Raise or fold? "))
+        user_answer = normalize_answer(input(f"{position}: raise or fold? "))
 
     correct_action = get_correct_action(position, hand_notation)
 
