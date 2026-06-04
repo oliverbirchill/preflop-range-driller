@@ -23,11 +23,11 @@ def get_ranges():
 
     return ranges
 
-def get_position():
+def get_position(ranges):
     while True:
         position = input("Which position do you want to practise? UTG/HJ/CO/BTN/SB: ").upper().strip()
 
-        if position in raise_ranges:
+        if position in ranges:
             return position
 
         print("Please enter a valid position: UTG/HJ/CO/BTN/SB.")
@@ -88,8 +88,8 @@ def get_number_of_questions():
 
         return number
 
-def get_correct_action(position, hand_notation):
-    return "raise" if hand_notation in raise_ranges[position] else "fold"
+def get_correct_action(position, hand_notation, ranges):
+    return "raise" if hand_notation in ranges[position] else "fold"
 
 def normalize_answer(answer):
     answer = answer.lower().strip()
@@ -128,7 +128,7 @@ score = 0
 raise_ranges = get_ranges()
 missed_hands = []
 
-position = get_position()
+position = get_position(raise_ranges)
 number_of_questions = get_number_of_questions()
 
 for question_number in range(number_of_questions):
@@ -145,7 +145,7 @@ for question_number in range(number_of_questions):
         print(ascii_hand_display)
         user_answer = normalize_answer(input(f"{position}: raise or fold? "))
 
-    correct_action = get_correct_action(position, hand_notation)
+    correct_action = get_correct_action(position, hand_notation, raise_ranges)
 
     if user_answer == correct_action:
         score += 1
