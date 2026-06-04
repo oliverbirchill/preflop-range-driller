@@ -98,15 +98,20 @@ def display_ascii_hand(hand):
     return "\n".join(combined_lines)
  
 score = 0
+missed_hands = []
 number_of_questions = get_number_of_questions()
 
 for question_number in range(number_of_questions):
     hand, hand_notation = generate_hand()
     ascii_hand_display = display_ascii_hand(hand)
+
+    print(f"\nQuestion {question_number + 1}/{number_of_questions}")
     print(ascii_hand_display)
     user_answer = normalize_answer(input("Raise or fold? "))
 
     while user_answer not in options:
+        print("\nPlease enter raise/r or fold/f.")
+        print(f"Question {question_number + 1}/{number_of_questions}")
         print(ascii_hand_display)
         user_answer = normalize_answer(input("Raise or fold? "))
 
@@ -116,6 +121,18 @@ for question_number in range(number_of_questions):
         score += 1
         print(f"Correct! Your score is now {score}.")
     else:
+        missed_hands.append((ascii_hand_display, user_answer, correct_action))
         print(f"Incorrect! According to your ranges, you should {correct_action} {hand_notation}. Your score is {score}.")
             
 print(f"Your final score is {score}/{number_of_questions} or {round(score / number_of_questions * 100)}%.")
+
+if missed_hands:
+    print("\nYou got the following hands wrong. Please review below: ")
+
+    
+    for missed_hand in missed_hands:
+        ascii_display, user_answer, correct_action = missed_hand
+        print(ascii_display)
+        print(f"You said {user_answer} but the correct answer was {correct_action}.\n")
+
+
