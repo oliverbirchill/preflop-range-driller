@@ -44,15 +44,6 @@ def generate_hand():
     hand_notation = get_hand_notation(hand)
 
     return hand, hand_notation
-    
-def display_hand(hand):
-    first_card = hand[0]
-    second_card = hand[1]
-
-    first_card_display = first_card[0] + first_card[1]
-    second_card_display = second_card[0] + second_card[1]
-
-    return first_card_display + " " + second_card_display
 
 def get_number_of_questions():
     while True:
@@ -112,11 +103,12 @@ number_of_questions = get_number_of_questions()
 for question_number in range(number_of_questions):
     hand, hand_notation = generate_hand()
     ascii_hand_display = display_ascii_hand(hand)
-    user_answer = normalize_answer(input(f"{ascii_hand_display} \nRaise or fold? "))
+    print(ascii_hand_display)
+    user_answer = normalize_answer(input("Raise or fold? "))
 
     while user_answer not in options:
-        print("That doesn't look to be a correct input... Please enter raise or fold.")
-        user_answer = normalize_answer(input(f"{ascii_hand_display} \nRaise or fold? "))
+        print(ascii_hand_display)
+        user_answer = normalize_answer(input("Raise or fold? "))
 
     correct_action = get_correct_action(hand_notation)
 
@@ -127,6 +119,3 @@ for question_number in range(number_of_questions):
         print(f"Incorrect! According to your ranges, you should {correct_action} {hand_notation}. Your score is {score}.")
             
 print(f"Your final score is {score}/{number_of_questions} or {round(score / number_of_questions * 100)}%.")
-
-        
-        
