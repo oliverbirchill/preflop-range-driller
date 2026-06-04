@@ -82,18 +82,41 @@ def normalize_answer(answer):
         return "fold"
     else:
         return answer
+    
+def display_ascii_card(card):
+    rank = card[0]
+    suit = card[1]
+    
+    return [
+        "┌─────┐",
+        f"│{rank}    │",
+        f"│  {suit}  │",
+        f"│    {rank}│",
+        "└─────┘",
+    ]
 
+def display_ascii_hand(hand):
+    first_card_lines = display_ascii_card(hand[0])
+    second_card_lines = display_ascii_card(hand[1])
+
+    combined_lines = []
+
+    for left_line, right_line in zip(first_card_lines, second_card_lines):
+        combined_lines.append(left_line + " " + right_line)
+
+    return "\n".join(combined_lines)
+ 
 score = 0
 number_of_questions = get_number_of_questions()
 
 for question_number in range(number_of_questions):
     hand, hand_notation = generate_hand()
-    display = display_hand(hand)
-    user_answer = normalize_answer(input(f"{display}. Raise or fold? "))
+    ascii_hand_display = display_ascii_hand(hand)
+    user_answer = normalize_answer(input(f"{ascii_hand_display} \nRaise or fold? "))
 
     while user_answer not in options:
         print("That doesn't look to be a correct input... Please enter raise or fold.")
-        user_answer = normalize_answer(input(f"{display}. Raise or fold? "))
+        user_answer = normalize_answer(input(f"{ascii_hand_display} \nRaise or fold? "))
 
     correct_action = get_correct_action(hand_notation)
 
@@ -101,7 +124,7 @@ for question_number in range(number_of_questions):
         score += 1
         print(f"Correct! Your score is now {score}.")
     else:
-        print(f"Incorrect! According to your ranges, you should {correct_action} {display}. Your score is {score}.")
+        print(f"Incorrect! According to your ranges, you should {correct_action} {hand_notation}. Your score is {score}.")
             
 print(f"Your final score is {score}/{number_of_questions} or {round(score / number_of_questions * 100)}%.")
 
