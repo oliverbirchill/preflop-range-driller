@@ -13,8 +13,8 @@ def get_ranges():
         next(csv_reader)
         
         for row in csv_reader:
-            position = row[0]
-            hand = row[1]
+            position = row[0].upper().strip()
+            hand = row[1].strip()
 
             if position not in ranges:
                 ranges[position] = {hand}
@@ -124,42 +124,49 @@ def display_ascii_hand(hand):
 
     return "\n".join(combined_lines)
  
-score = 0
-raise_ranges = get_ranges()
-missed_hands = []
 
-position = get_position(raise_ranges)
-number_of_questions = get_number_of_questions()
+def run_quiz(raise_ranges):
+    score = 0
+    missed_hands = []
 
-for question_number in range(number_of_questions):
-    hand, hand_notation = generate_hand()
-    ascii_hand_display = display_ascii_hand(hand)
+    position = get_position(raise_ranges)
+    number_of_questions = get_number_of_questions()
 
-    print(f"\nQuestion {question_number + 1}/{number_of_questions} - {position}")
-    print(ascii_hand_display)
-    user_answer = normalize_answer(input(f"{position}: raise or fold? "))
+    for question_number in range(number_of_questions):
+        hand, hand_notation = generate_hand()
+        ascii_hand_display = display_ascii_hand(hand)
 
-    while user_answer not in options:
-        print("\nPlease enter raise/r or fold/f.")
-        print(f"Question {question_number + 1}/{number_of_questions} - {position}")
+        print(f"\nQuestion {question_number + 1}/{number_of_questions} - {position}")
         print(ascii_hand_display)
         user_answer = normalize_answer(input(f"{position}: raise or fold? "))
 
-    correct_action = get_correct_action(position, hand_notation, raise_ranges)
+        while user_answer not in options:
+            print("\nPlease enter raise/r or fold/f.")
+            print(f"Question {question_number + 1}/{number_of_questions} - {position}")
+            print(ascii_hand_display)
+            user_answer = normalize_answer(input(f"{position}: raise or fold? "))
 
-    if user_answer == correct_action:
-        score += 1
-        print(f"Correct! Your score is now {score}.")
-    else:
-        missed_hands.append((ascii_hand_display, hand_notation, user_answer, correct_action))
-        print(f"Incorrect! According to your ranges, you should {correct_action} {hand_notation}. Your score is {score}.")
-            
-print(f"Your final score is {score}/{number_of_questions} or {round(score / number_of_questions * 100)}%.")
+        correct_action = get_correct_action(position, hand_notation, raise_ranges)
 
-if missed_hands:
-    print("\nYou got the following hands wrong. Please review below: ")
-    
-    for missed_hand in missed_hands:
-        ascii_display, hand_notation, user_answer, correct_action = missed_hand
-        print(ascii_display)
-        print(f"{hand_notation}: you said {user_answer}, correct answer was {correct_action}.\n")
+        if user_answer == correct_action:
+            score += 1
+            print(f"Correct! Your score is now {score}.")
+        else:
+            missed_hands.append((ascii_hand_display, hand_notation, user_answer, correct_action))
+            print(f"Incorrect! According to your ranges, you should {correct_action} {hand_notation}. Your score is {score}.")
+                
+    print(f"Your final score is {score}/{number_of_questions} or {round(score / number_of_questions * 100)}%.")
+
+    if missed_hands:
+        print("\nYou got the following hands wrong. Please review below: ")
+        
+        for missed_hand in missed_hands:
+            ascii_display, hand_notation, user_answer, correct_action = missed_hand
+            print(ascii_display)
+            print(f"{hand_notation}: you said {user_answer}, correct answer was {correct_action}.\n")
+
+def main():
+    raise_ranges = get_ranges()
+    run_quiz(raise_ranges)
+
+main()
