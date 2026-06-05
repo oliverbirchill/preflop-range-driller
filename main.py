@@ -1,5 +1,6 @@
 import random
 import csv
+import os
 
 ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 suits = ["♤", "♡", "♢", "♧"]
@@ -183,6 +184,8 @@ def run_quiz(raise_ranges):
         else:
             missed_hands.append((ascii_hand_display, hand_notation, user_answer, correct_action, position))
             print(f"Incorrect! According to your ranges, you should {correct_action} {hand_notation}. Your score is {score}.")
+
+        save_hand_result(position, hand_notation, user_answer, correct_action)
                 
     print(f"Your final score is {score}/{number_of_questions} or {round(score / number_of_questions * 100)}%.")
 
@@ -210,6 +213,23 @@ def get_yes_no_answer(prompt):
         yes_no_answer = "no"
 
     return yes_no_answer
+
+def save_hand_result(position, hand_notation, user_answer, correct_action):
+    file_needs_header = not os.path.exists("hand_history.csv") or os.stat("hand_history.csv").st_size == 0
+    result = ""
+
+    if user_answer == correct_action:
+        result = "correct"
+    else:
+        result = "incorrect"
+
+    with open("hand_history.csv", mode="a", newline="") as file:
+        csv_writer = csv.writer(file, quoting=csv.QUOTE_ALL)
+
+        if file_needs_header:
+            csv_writer.writerow(["position", "hand_notation", "user_answer", "correct_action", "result"])
+
+        csv_writer.writerow([position, hand_notation, user_answer, correct_action, result])
 
 def main():
     raise_ranges = get_ranges()
