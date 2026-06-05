@@ -105,7 +105,7 @@ def get_user_answer(prompt):
     user_answer = normalize_answer(input(prompt))
 
     while user_answer not in options:
-        user_answer = normalize_answer(input(f"Input error. {prompt}"))
+        user_answer = normalize_answer(input(f"Please type raise/r or fold/f. \n{prompt}"))
 
     return user_answer
 
@@ -189,7 +189,7 @@ def run_quiz(raise_ranges):
     if missed_hands:
         show_missed_hands(missed_hands)
 
-        missed_hand_review = input("Would you like to retry your missed hands? ").strip()
+        missed_hand_review = get_yes_no_answer("Would you like to retry your missed hands? ")
 
         if missed_hand_review == "yes":
             hands_still_missed = retry_missed_hands(missed_hands, raise_ranges)
@@ -197,9 +197,30 @@ def run_quiz(raise_ranges):
             while hands_still_missed:
                 hands_still_missed = retry_missed_hands(hands_still_missed, raise_ranges)
 
+def get_yes_no_answer(prompt):
+    valid_options = ["yes", "y", "no", "n"]
+    yes_no_answer = input(prompt).strip().lower()
+
+    while yes_no_answer not in valid_options:
+        yes_no_answer = input(f"Please answer yes/y or no/n. \n{prompt}").strip().lower()
+
+    if yes_no_answer == "y" or yes_no_answer == "yes":
+        yes_no_answer = "yes"
+    else:
+        yes_no_answer = "no"
+
+    return yes_no_answer
+
 def main():
     raise_ranges = get_ranges()
-    run_quiz(raise_ranges)
+    active = True
+
+    while active:
+        run_quiz(raise_ranges)
+        play_again = get_yes_no_answer("Would you like to play again? ")
+
+        if play_again == "no":
+            active = False
 
 if __name__ == "__main__":
     main()
