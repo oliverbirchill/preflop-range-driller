@@ -101,6 +101,14 @@ def normalize_answer(answer):
     else:
         return answer
     
+def get_user_answer(prompt):
+    user_answer = normalize_answer(input(prompt))
+
+    while user_answer not in options:
+        user_answer = normalize_answer(input(f"Input error. {prompt}"))
+
+    return user_answer
+
 def display_ascii_card(card):
     rank = card[0]
     suit = card[1]
@@ -135,18 +143,12 @@ def show_missed_hands(missed_hands):
 def retry_missed_hands(missed_hands, raise_ranges):
     hands_still_missed = []
 
-    for missed_hand in missed_hands:
+    for counter, missed_hand in enumerate(missed_hands):
         ascii_display, hand_notation, user_answer, correct_action, position = missed_hand
 
-        print(f"\nMissed hand review {missed_hands.index(missed_hand)}/{len(missed_hands)} - {position}")
+        print(f"\nMissed hand review {counter + 1}/{len(missed_hands)} - {position}")
         print(ascii_display)
-        user_answer = normalize_answer(input(f"{position}: raise or fold? "))
-
-        while user_answer not in options:
-            print("\nPlease enter raise/r or fold/f.")
-            print(f"Question {missed_hands.index(missed_hand)}/{len(missed_hands)} - {position}")
-            print(ascii_display)
-            user_answer = normalize_answer(input(f"{position}: raise or fold? "))
+        user_answer = get_user_answer(f"{position}: raise or fold? ")
 
         correct_action = get_correct_action(position, hand_notation, raise_ranges)
 
@@ -171,13 +173,7 @@ def run_quiz(raise_ranges):
 
         print(f"\nQuestion {question_number + 1}/{number_of_questions} - {position}")
         print(ascii_hand_display)
-        user_answer = normalize_answer(input(f"{position}: raise or fold? "))
-
-        while user_answer not in options:
-            print("\nPlease enter raise/r or fold/f.")
-            print(f"Question {question_number + 1}/{number_of_questions} - {position}")
-            print(ascii_hand_display)
-            user_answer = normalize_answer(input(f"{position}: raise or fold? "))
+        user_answer = get_user_answer(f"{position}: raise or fold? ")
 
         correct_action = get_correct_action(position, hand_notation, raise_ranges)
 
@@ -193,13 +189,13 @@ def run_quiz(raise_ranges):
     if missed_hands:
         show_missed_hands(missed_hands)
 
-    missed_hand_review = input("Would you like to retry your missed hands? ").strip()
+        missed_hand_review = input("Would you like to retry your missed hands? ").strip()
 
-    if missed_hand_review == "yes":
-        hands_still_missed = retry_missed_hands(missed_hands, raise_ranges)
+        if missed_hand_review == "yes":
+            hands_still_missed = retry_missed_hands(missed_hands, raise_ranges)
 
-        while hands_still_missed:
-            hands_still_missed = retry_missed_hands(hands_still_missed, raise_ranges)
+            while hands_still_missed:
+                hands_still_missed = retry_missed_hands(hands_still_missed, raise_ranges)
 
 def main():
     raise_ranges = get_ranges()
