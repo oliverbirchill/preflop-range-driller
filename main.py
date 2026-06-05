@@ -200,6 +200,8 @@ def run_quiz(raise_ranges):
             while hands_still_missed:
                 hands_still_missed = retry_missed_hands(hands_still_missed, raise_ranges)
 
+    print(read_hand_history())
+
 def get_yes_no_answer(prompt):
     valid_options = ["yes", "y", "no", "n"]
     yes_no_answer = input(prompt).strip().lower()
@@ -230,6 +232,38 @@ def save_hand_result(position, hand_notation, user_answer, correct_action):
             csv_writer.writerow(["position", "hand_notation", "user_answer", "correct_action", "result"])
 
         csv_writer.writerow([position, hand_notation, user_answer, correct_action, result])
+
+def read_hand_history():
+    stats = {}
+
+    with open("hand_history.csv", mode="r") as file:
+        csv_reader = csv.reader(file)
+        next(csv_reader)
+
+        for row in csv_reader:
+            position = row[0]
+            hand_notation = row[1]
+            result = row[4]
+            key = (position, hand_notation)
+            
+            if key not in stats:
+                stats[key] = {
+                    "seen": 0,
+                    "correct": 0,
+                    "incorrect": 0,
+                    "weakness": 0,
+                }
+
+            stats[key]["seen"] += 1
+
+            if result == "correct":
+                stats[key]["correct"] += 1
+                stats[key]["weakness"] = max(stats[key]["weakness"] -1, 0)
+            elif result == "incorrect":
+                stats[key]["incorrect"] += 1
+                stats[key]["weakness"] += 1
+
+        return stats
 
 def main():
     raise_ranges = get_ranges()
