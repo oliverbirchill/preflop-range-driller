@@ -123,7 +123,40 @@ def display_ascii_hand(hand):
         combined_lines.append(left_line + " " + right_line)
 
     return "\n".join(combined_lines)
- 
+
+def show_missed_hands(missed_hands):
+    print("\nYou got the following hands wrong. Please review below: ")
+    
+    for missed_hand in missed_hands:
+        ascii_display, hand_notation, user_answer, correct_action, position = missed_hand
+        print(ascii_display)
+        print(f"{hand_notation}: you said {user_answer}, correct answer was {correct_action}.\n")
+
+def retry_missed_hands(missed_hands, raise_ranges):
+    hands_still_missed = []
+
+    for missed_hand in missed_hands:
+        ascii_display, hand_notation, user_answer, correct_action, position = missed_hand
+
+        print(f"\nMissed hand review {missed_hands.index(missed_hand)}/{len(missed_hands)} - {position}")
+        print(ascii_display)
+        user_answer = normalize_answer(input(f"{position}: raise or fold? "))
+
+        while user_answer not in options:
+            print("\nPlease enter raise/r or fold/f.")
+            print(f"Question {missed_hands.index(missed_hand)}/{len(missed_hands)} - {position}")
+            print(ascii_display)
+            user_answer = normalize_answer(input(f"{position}: raise or fold? "))
+
+        correct_action = get_correct_action(position, hand_notation, raise_ranges)
+
+        if user_answer == correct_action:
+            print(f"Correct!")
+        else:
+            hands_still_missed.append((ascii_display, hand_notation, user_answer, correct_action, position))
+            print(f"That's still not right :( According to your ranges, you should {correct_action} {hand_notation}.")
+
+    return hands_still_missed
 
 def run_quiz(raise_ranges):
     score = 0
@@ -152,21 +185,25 @@ def run_quiz(raise_ranges):
             score += 1
             print(f"Correct! Your score is now {score}.")
         else:
-            missed_hands.append((ascii_hand_display, hand_notation, user_answer, correct_action))
+            missed_hands.append((ascii_hand_display, hand_notation, user_answer, correct_action, position))
             print(f"Incorrect! According to your ranges, you should {correct_action} {hand_notation}. Your score is {score}.")
                 
     print(f"Your final score is {score}/{number_of_questions} or {round(score / number_of_questions * 100)}%.")
 
     if missed_hands:
-        print("\nYou got the following hands wrong. Please review below: ")
-        
-        for missed_hand in missed_hands:
-            ascii_display, hand_notation, user_answer, correct_action = missed_hand
-            print(ascii_display)
-            print(f"{hand_notation}: you said {user_answer}, correct answer was {correct_action}.\n")
+        show_missed_hands(missed_hands)
+
+    missed_hand_review = input("Would you like to retry your missed hands? ").strip()
+
+    if missed_hand_review == "yes":
+        hands_still_missed = retry_missed_hands(missed_hands, raise_ranges)
+
+        while hands_still_missed:
+            hands_still_missed = retry_missed_hands(hands_still_missed, raise_ranges)
 
 def main():
     raise_ranges = get_ranges()
     run_quiz(raise_ranges)
 
-main()
+if __name__ == "__main__":
+    main()
